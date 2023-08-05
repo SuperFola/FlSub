@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
+import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/auth_api.dart';
 import 'package:subsonic_flutter/main.dart';
 
@@ -19,6 +20,50 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   final AuthAPI _authAPI = AuthAPI();
+
+  void _navigateToHome(String url, String username, String password) {
+    ServerData.url = url;
+    ServerData.username = username;
+    ServerData.password = password;
+
+    Navigator.of(context).pop();
+    Navigator.of(context).pushNamed(MyHomePage.routeName);
+  }
+
+  void _showError(BuildContext context, SubsonicError error) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text("Error"),
+              content: Text(error.message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
+  }
+
+  void _connect() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        String url = serverUrlController.text;
+        String username = usernameController.text;
+        String password = passwordController.text;
+
+        var pingReq = await _authAPI.login(url, username, password);
+        pingReq.match((l) => _showError(context, l),
+            (r) => _navigateToHome(url, username, password));
+      } on Exception catch (e) {
+        // FIXME maybe do not show the whole error message here
+        _showError(context, SubsonicError(-1, e.toString()));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Please fill input')));
+    }
+  }
 
   @override
   void dispose() {
@@ -95,28 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                   child: Center(
                       child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        try {
-                          ServerData.url = serverUrlController.text;
-                          ServerData.username = usernameController.text;
-                          ServerData.password = passwordController.text;
-
-                          var ping = await _authAPI.login();
-                          if (ping.statusCode == 200) {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pushNamed(MyHomePage.routeName);
-                          } else {
-                            print(ping.body);  // TODO: add an error page or widget
-                          }
-                        } on Exception catch (e) {
-                          print(e);  // TODO: add an error page or widget
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please fill input')));
-                      }
-                    },
+                    onPressed: _connect,
                     child: const Text('Submit'),
                   )),
                 ),

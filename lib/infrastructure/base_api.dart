@@ -10,30 +10,17 @@ class BaseAPI {
     "f": "json",
   };
 
-  static const errorCodes = {
-    "0": "Generic error",
-    "10": "Required parameter is missing",
-    "20": "Incompatible Subsonic REST protocol version. Client must upgrade",
-    "30": "Incompatible Subsonic REST protocol version. Server must upgrade",
-    "40": "Wrong username or password",
-    "41": "Token authentication not supported for LDAP users",
-    "50": "User is not authorized for the given operation",
-    "60":
-        "The trial period for the Subsonic server is over. Please upgrade to Subsonic Premium",
-    "70": "Requested data was not found"
-  };
-
-  Uri ping() {
+  Uri ping(String host, String username, String password) {
     var queryParams = {
       ...defaultParameters,
-      "u": ServerData.username as String,
+      "u": username,
       // FIXME for testing only
-      "p": ServerData.password as String,
+      "p": password,
     };
 
     return Uri(
       scheme: 'https',
-      host: ServerData.url,
+      host: host,
       path: pingRoute,
       queryParameters: queryParams,
     );

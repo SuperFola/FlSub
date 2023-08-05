@@ -1,14 +1,28 @@
 import 'dart:convert';
 
+import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
+import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 
 import 'base_api.dart';
 
 class AuthAPI extends BaseAPI {
-  Future<http.Response> login() async {
-    print("making ping request!");
-    http.Response response = await http.post(super.ping());
+  Future<Either<SubsonicError, Unit>> login(String host, String username, String password) async {
+    try {
+      var response = await http.post(super.ping(host, username, password));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> parsed = jsonDecode(response.body);
 
-    return response;
+        if (parsed.containsKey("error")) {
+          return Left(SubsonicError(parsed["error"]["code"], parsed["error"]["message"]));
+        } else {
+          return const Right(unit);
+        }
+      }
+
+      return const Left(SubsonicError.unknownError);
+    } on http.ClientException catch (e) {
+      return Future.value(Left(SubsonicError(-1, e.message)));
+    }
   }
 }
