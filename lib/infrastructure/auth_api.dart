@@ -27,7 +27,7 @@ class AuthAPI extends BaseAPI {
 
   Future<Either<SubsonicError, Unit>> login(String host, String username, String password) async {
     try {
-      var response = await http.post(super.ping(host, username, password));
+      var response = await http.post(super.pingUri(host, username, password));
       if (response.statusCode == 200) {
         Map<String, dynamic> parsed = jsonDecode(response.body);
 
