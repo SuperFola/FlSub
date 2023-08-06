@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/auth_api.dart';
-import 'package:subsonic_flutter/main.dart';
+
+import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   static const String routeName = "/login";
@@ -21,13 +23,8 @@ class _LoginPageState extends State<LoginPage> {
 
   final AuthAPI _authAPI = AuthAPI();
 
-  void _navigateToHome(String url, String username, String password) {
-    ServerData.url = url;
-    ServerData.username = username;
-    ServerData.password = password;
-
-    Navigator.of(context).pop();
-    Navigator.of(context).pushNamed(MyHomePage.routeName);
+  void _navigateToHome() {
+    Navigator.of(context).pushReplacementNamed(MyHomePage.routeName);
   }
 
   void _showError(BuildContext context, SubsonicError error) {
@@ -54,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
 
         var pingReq = await _authAPI.login(url, username, password);
         pingReq.match((l) => _showError(context, l),
-            (r) => _navigateToHome(url, username, password));
+            (r) => _navigateToHome());
       } on Exception catch (e) {
         // FIXME maybe do not show the whole error message here
         _showError(context, SubsonicError(-1, e.toString()));
@@ -63,6 +60,27 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Please fill input')));
     }
+  }
+
+  String? _validateServerURL(value) {
+    if (value == null || value.isEmpty) {
+      return 'Server URL is required';
+    }
+    return null;
+  }
+
+  String? _validateUsername(value) {
+    if (value == null || value.isEmpty) {
+      return 'Username is required';
+    }
+    return null;
+  }
+
+  String? _validatePassword(value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    return null;
   }
 
   @override
@@ -99,12 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Server URL"),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Server URL is required';
-                        }
-                        return null;
-                      },
+                      validator: _validateServerURL,
                     )),
                 Padding(
                     padding:
@@ -113,12 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: usernameController,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: "Username"),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Username is required';
-                        }
-                        return null;
-                      },
+                      validator: _validateUsername,
                     )),
                 Padding(
                     padding:
@@ -128,12 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: true,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(), labelText: "Password"),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        return null;
-                      },
+                      validator: _validatePassword,
                     )),
                 Padding(
                   padding:

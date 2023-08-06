@@ -1,11 +1,7 @@
-import 'package:http/http.dart' as http;
-
 class ServerData {
-  static String? url;
-  static String? username;
-  static String? password;
+  String url = "";
+  String username = "";
+  String password = "";
 
-  static bool isDefined() {
-    return url != null && username != null && password != null;
-  }
+  ServerData({required this.url, required this.username, required this.password});
 }
