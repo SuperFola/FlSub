@@ -10,4 +10,12 @@ class Playlist {
   final String? covertArtId;
 
   Playlist(this.id, this.name, this.owner, this.isPublic, this.createdAt, this.changedAt, this.songCount, this.durationSeconds, this.covertArtId);
+
+  String get formattedDuration {
+    var duration = Duration(seconds: durationSeconds);
+    var hours = duration.inHours;
+    var minutes = (duration.inMinutes % 60).toString().padLeft(2, "0");
+    var seconds = (duration.inSeconds % 60).toString().padLeft(2, "0");
+    return "$hours:$minutes:$seconds";
+  }
 }

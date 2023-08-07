@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: isLoggedIn ? const MyHomePage(title: properties.appName) : const LoginPage(),
+      home: isLoggedIn ? MyHomePage(title: properties.getIt<ServerData>().username) : const LoginPage(),
       routes: {
         LoginPage.routeName: (BuildContext _) => const LoginPage(),
         MyHomePage.routeName: (BuildContext _) => MyHomePage(title: properties.getIt<ServerData>().username)
