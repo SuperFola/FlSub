@@ -93,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.amber,
           centerTitle: true,
           title: const Text(
             "Login to Subsonic",

@@ -1,4 +1,5 @@
 import 'package:audio_session/audio_session.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
+import 'package:system_theme/system_theme.dart';
 
 import 'domain/model/server.dart';
 import 'properties.dart' as properties;
@@ -16,6 +18,8 @@ T? ambiguate<T>(T? value) => value;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemTheme.accentColor.load();
 
   await JustAudioBackground.init(
     androidNotificationChannelId: 'io.lexplt.subsonic_flutter.channel.audio',
@@ -86,26 +90,52 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: properties.appName,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
-      home: isLoggedIn
-          ? MyHomePage(title: properties.getIt<ServerData>().username)
-          : const LoginPage(),
-      routes: {
-        LoginPage.routeName: (BuildContext _) => const LoginPage(),
-        MyHomePage.routeName: (BuildContext _) =>
-            MyHomePage(title: properties.getIt<ServerData>().username),
-        PlaylistPage.routeName: (BuildContext _) => const PlaylistPage(),
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        ColorScheme lightColorScheme;
+        ColorScheme darkColorScheme;
+
+        if (lightDynamic != null && darkDynamic != null) {
+          // On Android S+ devices, use the provided dynamic color scheme.
+          // (Recommended) Harmonize the dynamic color scheme' built-in semantic colors.
+          lightColorScheme = lightDynamic.harmonized();
+          // Repeat for the dark color scheme.
+          darkColorScheme = darkDynamic.harmonized();
+        } else {
+          // Otherwise, use fallback schemes.
+          lightColorScheme = ColorScheme.fromSeed(
+            seedColor: SystemTheme.accentColor.accent,
+            secondary: SystemTheme.accentColor.light,
+          );
+          darkColorScheme = ColorScheme.fromSeed(
+            seedColor: SystemTheme.accentColor.accent,
+            secondary: SystemTheme.accentColor.dark,
+            brightness: Brightness.dark,
+          );
+        }
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: properties.appName,
+          theme: ThemeData(
+            colorScheme: lightColorScheme,
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkColorScheme,
+            useMaterial3: true,
+          ),
+          themeMode: ThemeMode.system,
+          home: isLoggedIn
+              ? MyHomePage(title: properties.getIt<ServerData>().username)
+              : const LoginPage(),
+          routes: {
+            LoginPage.routeName: (BuildContext _) => const LoginPage(),
+            MyHomePage.routeName: (BuildContext _) =>
+                MyHomePage(title: properties.getIt<ServerData>().username),
+            PlaylistPage.routeName: (BuildContext _) => const PlaylistPage(),
+          },
+        );
       },
     );
   }
