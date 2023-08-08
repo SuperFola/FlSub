@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/pages/home.dart';
@@ -128,14 +129,30 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             useMaterial3: true,
           ),
           themeMode: ThemeMode.system,
-          home: isLoggedIn
-              ? MyHomePage(title: properties.getIt<ServerData>().username)
-              : const LoginPage(),
-          routes: {
-            LoginPage.routeName: (BuildContext _) => const LoginPage(),
-            MyHomePage.routeName: (BuildContext _) =>
-                MyHomePage(title: properties.getIt<ServerData>().username),
-            PlaylistPage.routeName: (BuildContext _) => const PlaylistPage(),
+          home: isLoggedIn ? const MyHomePage() : const LoginPage(),
+          onGenerateRoute: (settings) {
+            switch (settings.name) {
+              case LoginPage.routeName:
+                return PageTransition(
+                  child: const LoginPage(),
+                  type: PageTransitionType.rightToLeft,
+                  settings: settings,
+                );
+              case MyHomePage.routeName:
+                return PageTransition(
+                  child: const MyHomePage(),
+                  type: PageTransitionType.rightToLeft,
+                  settings: settings,
+                );
+              case PlaylistPage.routeName:
+                return PageTransition(
+                  child: const PlaylistPage(),
+                  type: PageTransitionType.rightToLeft,
+                  settings: settings,
+                );
+              default:
+                return null;
+            }
           },
         );
       },

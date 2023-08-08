@@ -94,9 +94,8 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text(
-            "Login to Subsonic",
-          ),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text("Login to Subsonic"),
         ),
         body: Form(
           key: _formKey,

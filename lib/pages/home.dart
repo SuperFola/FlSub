@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
+import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
@@ -13,9 +14,8 @@ import 'package:subsonic_flutter/widgets/subsonic_card.dart';
 
 class MyHomePage extends StatefulWidget {
   static const String routeName = "/home";
-  final String title;
 
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -184,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(getIt<ServerData>().username),
         actions: [
           IconButton(
             onPressed: () => _showModalFilterPlaylist(context),

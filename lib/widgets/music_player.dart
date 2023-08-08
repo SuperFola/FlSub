@@ -72,10 +72,10 @@ class _MusicPlayerState extends State<MusicPlayer> {
       stream: _player.loopModeStream,
       builder: (context, snapshot) {
         final loopMode = snapshot.data ?? LoopMode.off;
-        const icons = [
-          Icon(Icons.repeat, color: Colors.white54),
-          Icon(Icons.repeat, color: Colors.orange),
-          Icon(Icons.repeat_one, color: Colors.orange),
+        var icons = [
+          const Icon(Icons.repeat, color: Colors.white54),
+          Icon(Icons.repeat, color: Theme.of(context).colorScheme.primary),
+          Icon(Icons.repeat_one, color: Theme.of(context).colorScheme.primary),
         ];
         const cycleModes = [
           LoopMode.off,
@@ -101,7 +101,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
         final shuffleModeEnabled = snapshot.data ?? false;
         return IconButton(
           icon: shuffleModeEnabled
-              ? const Icon(Icons.shuffle, color: Colors.orange)
+              ? Icon(Icons.shuffle, color: Theme.of(context).colorScheme.primary)
               : const Icon(Icons.shuffle, color: Colors.white54),
           onPressed: () async {
             final enable = !shuffleModeEnabled;
