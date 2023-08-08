@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart' as fp;
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/widgets/music_player.dart';
 
 class MyHomePage extends StatefulWidget {
   static const String routeName = "/home";
@@ -55,22 +56,34 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            // trailing: const Icon(Icons.star_outline),
-            // isThreeLine: true,
           ),
         ),
       );
     }
 
+    children.add(Container(height: 200));
+
     return RefreshIndicator(
-        onRefresh: _refreshPlaylists,
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            // FIXME: this adds weird blank spaces at the top and bottom that crops the content
-            child: ListView(
+      onRefresh: () async {
+        setState(() {
+          _isFetchingData = const fp.Right(true);
+        });
+        await _refreshPlaylists();
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        // FIXME: this adds weird blank spaces at the top and bottom that crops the content
+        child: Stack(
+          children: [
+            ListView(
               shrinkWrap: true,
               children: children,
-            )));
+            ),
+            const MusicPlayer(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLoadingAnimation() {
