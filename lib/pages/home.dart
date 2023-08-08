@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
@@ -9,6 +8,7 @@ import 'package:subsonic_flutter/pages/playlist.dart';
 import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
+import 'package:subsonic_flutter/widgets/subsonic_card.dart';
 
 class MyHomePage extends StatefulWidget {
   static const String routeName = "/home";
@@ -43,39 +43,23 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildPlaylists(List<Playlist> playlists) {
     var children = List<Widget>.empty(growable: true);
     for (int index = 0; index < playlists.length; index++) {
-      children.add(
-        Card(
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: CachedNetworkImage(
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-                imageUrl:
-                    _musicRepository.getCoverArtUrlFor(playlists[index].id, null),
-                height: 72,
-                fit: BoxFit.fill,
-              ),
-            ),
-            onTap: () => Navigator.of(context).pushNamed(PlaylistPage.routeName,
-                arguments: PlaylistArguments(playlists[index])),
-            title: Text(playlists[index].name),
-            subtitle: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(playlists[index].songCount.toString()),
-                    const Icon(Icons.my_library_music_outlined),
-                    Text(playlists[index].formattedDuration),
-                    const Icon(Icons.timer_outlined),
-                  ],
-                ),
-              ],
-            ),
+      children.add(SubsonicCard(
+        title: playlists[index].name,
+        imageUrl: _musicRepository.getCoverArtUrlFor(playlists[index].id, null),
+        content: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(playlists[index].songCount.toString()),
+              const Icon(Icons.my_library_music_outlined),
+              Text(playlists[index].formattedDuration),
+              const Icon(Icons.timer_outlined),
+            ],
           ),
-        ),
-      );
+        ],
+        onTap: () => Navigator.of(context).pushNamed(PlaylistPage.routeName,
+            arguments: PlaylistArguments(playlists[index])),
+      ));
     }
 
     children.add(Container(height: 200));
