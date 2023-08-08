@@ -5,6 +5,7 @@ import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
+import 'package:subsonic_flutter/properties.dart';
 import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
@@ -21,7 +22,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _musicRepository = MusicRepository();
+  final _musicRepository = getIt<MusicRepository>();
   fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(true);
 
   _MyHomePageState() {

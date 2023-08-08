@@ -8,13 +8,14 @@ class SubsonicCard extends StatelessWidget {
   final bool? isThreeLines;
   final void Function()? onTap;
 
-  const SubsonicCard(
-      {super.key,
-      required this.title,
-      required this.imageUrl,
-      required this.content,
-      this.isThreeLines,
-      this.onTap});
+  const SubsonicCard({
+    super.key,
+    required this.title,
+    required this.imageUrl,
+    required this.content,
+    this.isThreeLines,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,10 @@ class SubsonicCard extends StatelessWidget {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: CachedNetworkImage(
-            placeholder: (context, url) => const CircularProgressIndicator(),
+            fadeInCurve: Curves.fastLinearToSlowEaseIn,
+            placeholder: (context, url) => const SizedBox(height: 72),
+            cacheKey: imageUrl,
+            maxHeightDiskCache: 72,
             imageUrl: imageUrl,
             height: 72,
             fit: BoxFit.fill,

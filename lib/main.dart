@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
@@ -39,6 +40,7 @@ void main() async {
         password: await storage.read(key: "server.password") ?? ""),
   );
   properties.getIt.registerSingleton<AudioPlayer>(AudioPlayer());
+  properties.getIt.registerSingleton<MusicRepository>(MusicRepository());
 
   runApp(MyApp(
     isLoggedIn: isLoggedIn,

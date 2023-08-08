@@ -33,6 +33,10 @@ class MusicRepository {
     return _playlistsSongs[id] ?? [];
   }
 
+  bool hasPlaylist(String id) {
+    return _playlistsSongs.containsKey(id);
+  }
+
   Future<Either<SubsonicError, List<Playlist>>> fetchPlaylists() async {
     final data = getIt<ServerData>();
     final playlists = await _musicAPI.getPlaylists(data);

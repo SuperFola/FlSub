@@ -4,6 +4,7 @@ import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/properties.dart';
 import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
@@ -19,7 +20,7 @@ class PlaylistPage extends StatefulWidget {
 }
 
 class _PlaylistPageState extends State<PlaylistPage> {
-  final _musicRepository = MusicRepository();
+  final _musicRepository = getIt<MusicRepository>();
   fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(true);
   bool _firstFetch = true;
 
@@ -96,7 +97,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
     final args =
         ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
     if (_firstFetch) {
-      _refreshPlaylist(args.playlist.id);
+      if (!_musicRepository.hasPlaylist(args.playlist.id)) {
+        _refreshPlaylist(args.playlist.id);
+      } else {
+        _isFetchingData = const fp.Right(false);
+      }
       _firstFetch = false;
     }
 
