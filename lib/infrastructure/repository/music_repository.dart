@@ -129,7 +129,7 @@ class MusicRepository {
             id: '$index',
             album: song.album,
             title: song.title,
-            artUri: _musicAPI.getCoverArtUri(data, song.safeCoverArtId, null),
+            artUri: _musicAPI.getCoverArtUri(data, song.covertArtId ?? playlistId, null),
           ),
         ));
       }
