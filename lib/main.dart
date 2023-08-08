@@ -1,9 +1,9 @@
 import 'package:audio_session/audio_session.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
@@ -71,8 +71,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     // Listen to errors during playback.
     properties.getIt<AudioPlayer>().playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
-          print('A stream error occurred: $e');
-        });
+      print('A stream error occurred: $e');
+    });
   }
 
   @override

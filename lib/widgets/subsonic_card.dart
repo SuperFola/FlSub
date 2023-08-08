@@ -8,7 +8,13 @@ class SubsonicCard extends StatelessWidget {
   final bool? isThreeLines;
   final void Function()? onTap;
 
-  const SubsonicCard({super.key, required this.title, required this.imageUrl, required this.content, this.isThreeLines, this.onTap});
+  const SubsonicCard(
+      {super.key,
+      required this.title,
+      required this.imageUrl,
+      required this.content,
+      this.isThreeLines,
+      this.onTap});
 
   @override
   Widget build(BuildContext context) {

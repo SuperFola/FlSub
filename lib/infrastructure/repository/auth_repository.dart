@@ -19,8 +19,8 @@ class AuthRepository {
     }
   }
 
-  Future<void> _persistLoginData(String host, String username,
-      String password) async {
+  Future<void> _persistLoginData(
+      String host, String username, String password) async {
     _serverData = ServerData(url: host, username: username, password: password);
     _isLoggedIn = true;
 
@@ -37,8 +37,8 @@ class AuthRepository {
     getIt<ServerData>().url = host;
   }
 
-  Future<Either<SubsonicError, Unit>> login(String host, String username,
-      String password) async {
+  Future<Either<SubsonicError, Unit>> login(
+      String host, String username, String password) async {
     var result = await _authAPI.login(host, username, password);
     result.map((_) => _persistLoginData(host, username, password));
 

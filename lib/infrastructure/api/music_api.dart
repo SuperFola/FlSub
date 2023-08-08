@@ -85,7 +85,8 @@ class MusicAPI extends BaseAPI {
     }
   }
 
-  Future<Either<SubsonicError, Unit>> streamSong(ServerData data, String id) async {
+  Future<Either<SubsonicError, Unit>> streamSong(
+      ServerData data, String id) async {
     try {
       var response = await http.post(super.getStreamSongUri(data, id));
       if (response.statusCode == 200) {

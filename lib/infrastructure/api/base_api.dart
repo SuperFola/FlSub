@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 
 class BaseAPI {
@@ -10,17 +14,26 @@ class BaseAPI {
   static const streamRoute = "$subsonicEndpoint/stream.view";
 
   static const defaultParameters = {
-    "v": "1.2.0",
+    "v": "1.13.0",
     "c": "FlSub",
     "f": "json",
   };
 
+  String _generateRandomString(int len) {
+    var r = Random();
+    const chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
+  }
+
   Uri _baseURI(ServerData data, String path, Map<String, String> params) {
+    final salt = _generateRandomString(16);
+
     var queryParams = {
       ...defaultParameters,
       "u": data.username,
-      // FIXME for testing only
-      "p": data.password,
+      "t": md5.convert(utf8.encode(data.password + salt)).toString(),
+      "s": salt,
       ...params,
     };
 

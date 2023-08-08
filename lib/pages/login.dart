@@ -48,8 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         String password = passwordController.text;
 
         var pingReq = await _authRepository.login(url, username, password);
-        pingReq.match((l) => _showError(context, l),
-            (r) => _navigateToHome());
+        pingReq.match((l) => _showError(context, l), (r) => _navigateToHome());
       } on Exception catch (e) {
         // FIXME maybe do not show the whole error message here
         _showError(context, SubsonicError(-1, e.toString()));

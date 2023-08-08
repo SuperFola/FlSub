@@ -52,10 +52,12 @@ class SeekBarState extends State<SeekBar> {
             builder: (context, snapshot) => IconButton(
               icon: Icon(
                 Icons.skip_previous_outlined,
-                color: widget.player.hasPrevious ? Colors.white : Colors.white38,
+                color:
+                    widget.player.hasPrevious ? Colors.white : Colors.white38,
               ),
-              onPressed:
-                  widget.player.hasPrevious ? widget.player.seekToPrevious : null,
+              onPressed: widget.player.hasPrevious
+                  ? widget.player.seekToPrevious
+                  : null,
             ),
           ),
         ),
@@ -71,7 +73,8 @@ class SeekBarState extends State<SeekBar> {
                   value: min(
                       _dragValue ?? widget.position.inMilliseconds.toDouble(),
                       widget.duration.inMilliseconds.toDouble()),
-                  secondaryTrackValue: min(widget.bufferedPosition.inMilliseconds.toDouble(),
+                  secondaryTrackValue: min(
+                      widget.bufferedPosition.inMilliseconds.toDouble(),
                       widget.duration.inMilliseconds.toDouble()),
                   onChanged: (value) {
                     setState(() {
@@ -83,7 +86,8 @@ class SeekBarState extends State<SeekBar> {
                   },
                   onChangeEnd: (value) {
                     if (widget.onChangeEnd != null) {
-                      widget.onChangeEnd!(Duration(milliseconds: value.round()));
+                      widget
+                          .onChangeEnd!(Duration(milliseconds: value.round()));
                     }
                     _dragValue = null;
                   },
@@ -97,7 +101,8 @@ class SeekBarState extends State<SeekBar> {
                             .firstMatch("$_remaining")
                             ?.group(1) ??
                         '$_remaining',
-                    style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                    style:
+                        const TextStyle(color: Colors.white70, fontSize: 11)),
               ),
             ],
           ),
@@ -111,7 +116,8 @@ class SeekBarState extends State<SeekBar> {
                 Icons.skip_next_outlined,
                 color: widget.player.hasNext ? Colors.white : Colors.white38,
               ),
-              onPressed: widget.player.hasNext ? widget.player.seekToNext : null,
+              onPressed:
+                  widget.player.hasNext ? widget.player.seekToNext : null,
             ),
           ),
         ),

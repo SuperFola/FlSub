@@ -9,7 +9,8 @@ class Playlist {
   final int durationSeconds;
   final String? covertArtId;
 
-  Playlist(this.id, this.name, this.owner, this.isPublic, this.createdAt, this.changedAt, this.songCount, this.durationSeconds, this.covertArtId);
+  Playlist(this.id, this.name, this.owner, this.isPublic, this.createdAt,
+      this.changedAt, this.songCount, this.durationSeconds, this.covertArtId);
 
   String get formattedDuration {
     var duration = Duration(seconds: durationSeconds);
