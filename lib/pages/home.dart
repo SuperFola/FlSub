@@ -94,75 +94,86 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  void _showModelFilterPlaylist(BuildContext context) {
+  void _showModalFilterPlaylist(BuildContext context) {
+    children(StateSetter myState) => [
+          ListTile(
+            title: const Text('Alphabetical'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.alphabetical,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+          ListTile(
+            title: const Text('Reversed alphabetical'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.reverseAlphabetical,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+          ListTile(
+            title: const Text('Ascending duration'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.duration,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+          ListTile(
+            title: const Text('Descending duration'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.descendingDuration,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+          ListTile(
+            title: const Text('Ascending songs count'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.songsCount,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+          ListTile(
+            title: const Text('Descending songs count'),
+            leading: Radio<PlaylistsSort>(
+              value: PlaylistsSort.descendingSongsCount,
+              groupValue: _musicRepository.playlistSort,
+              onChanged: (PlaylistsSort? value) =>
+                  _onFilterPlaylistsChanged(value, myState),
+            ),
+          ),
+        ];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      enableDrag: true,
+      showDragHandle: true,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter myState) {
-            return SizedBox(
-              height: 200,
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: const Text('Alphabetical'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.alphabetical,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter myState) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height / 4.0,
                   ),
-                  ListTile(
-                    title: const Text('Reversed alphabetical'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.reverseAlphabetical,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
+                  child: ListView(
+                    children: children(myState),
                   ),
-                  ListTile(
-                    title: const Text('Ascending duration'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.duration,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Descending duration'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.descendingDuration,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Ascending songs count'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.songsCount,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Descending songs count'),
-                    leading: Radio<PlaylistsSort>(
-                      value: PlaylistsSort.descendingSongsCount,
-                      groupValue: _musicRepository.playlistSort,
-                      onChanged: (PlaylistsSort? value) =>
-                          _onFilterPlaylistsChanged(value, myState),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+                );
+              },
+            ),
+          ],
         );
       },
     );
@@ -188,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showModelFilterPlaylist(context),
+        onPressed: () => _showModalFilterPlaylist(context),
         tooltip: "Sort",
         child: const Icon(Icons.sort),
       ),

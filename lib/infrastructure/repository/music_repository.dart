@@ -24,8 +24,12 @@ class MusicRepository {
   Map<String, List<Song>> _playlistsSongs = {};
 
   List<Playlist> get playlists => _sortedPlaylists;
+
   PlaylistsSort get playlistSort => _playlistSort;
-  List<Song> playlist(String id) { return _playlistsSongs[id] ?? []; }
+
+  List<Song> playlist(String id) {
+    return _playlistsSongs[id] ?? [];
+  }
 
   Future<Either<SubsonicError, List<Playlist>>> fetchPlaylists() async {
     final data = getIt<ServerData>();
@@ -39,7 +43,8 @@ class MusicRepository {
     return playlists;
   }
 
-  Future<Either<SubsonicError, List<Song>>> fetchSinglePlaylist(String id) async {
+  Future<Either<SubsonicError, List<Song>>> fetchSinglePlaylist(
+      String id) async {
     final data = getIt<ServerData>();
     final songs = await _musicAPI.getSinglePlaylist(data, id);
 
