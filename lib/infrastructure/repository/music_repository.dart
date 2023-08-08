@@ -25,16 +25,29 @@ class MusicRepository {
 
   List<Playlist> get playlists => _sortedPlaylists;
   PlaylistsSort get playlistSort => _playlistSort;
+  List<Song> playlist(String id) { return _playlistsSongs[id] ?? []; }
 
   Future<Either<SubsonicError, List<Playlist>>> fetchPlaylists() async {
     final data = getIt<ServerData>();
     final playlists = await _musicAPI.getPlaylists(data);
+
     playlists.map((data) {
       _playlists = data;
       sortPlaylistsBy(_playlistSort);
     });
 
     return playlists;
+  }
+
+  Future<Either<SubsonicError, List<Song>>> fetchSinglePlaylist(String id) async {
+    final data = getIt<ServerData>();
+    final songs = await _musicAPI.getSinglePlaylist(data, id);
+
+    songs.map((data) {
+      _playlistsSongs[id] = data;
+    });
+
+    return songs;
   }
 
   List<Playlist> sortPlaylistsBy(PlaylistsSort sort) {

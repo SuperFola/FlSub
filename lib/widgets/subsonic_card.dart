@@ -5,9 +5,10 @@ class SubsonicCard extends StatelessWidget {
   final String title;
   final String imageUrl;
   final List<Widget> content;
+  final bool? isThreeLines;
   final void Function()? onTap;
 
-  const SubsonicCard({super.key, required this.title, required this.imageUrl, required this.content, this.onTap});
+  const SubsonicCard({super.key, required this.title, required this.imageUrl, required this.content, this.isThreeLines, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +24,11 @@ class SubsonicCard extends StatelessWidget {
           ),
         ),
         onTap: onTap,
-        title: Text(title),
+        title: Text(title, overflow: TextOverflow.ellipsis, maxLines: 1),
         subtitle: Column(
           children: content,
         ),
+        isThreeLine: isThreeLines ?? false,
       ),
     );
   }

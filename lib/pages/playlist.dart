@@ -7,6 +7,7 @@ import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart
 import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
+import 'package:subsonic_flutter/widgets/subsonic_card.dart';
 
 class PlaylistPage extends StatefulWidget {
   static const String routeName = "/playlist";
@@ -20,25 +21,64 @@ class PlaylistPage extends StatefulWidget {
 class _PlaylistPageState extends State<PlaylistPage> {
   final _musicRepository = MusicRepository();
   fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(true);
+  bool _firstFetch = true;
 
-  _PlaylistPageState() {
-    _refreshPlaylist();
+  Future<void> _refreshPlaylist(String id) async {
+    _musicRepository.fetchSinglePlaylist(id).then((value) {
+      value.match((error) {
+        _isFetchingData = fp.Left(error);
+        setState(() {});
+      }, (_) {
+        _isFetchingData = const fp.Right(false);
+        setState(() {});
+      });
+    });
   }
 
-  Future<void> _refreshPlaylist() async {
-    // TODO
-  }
+  Widget _buildPlaylist(String playlistId, List<Song> songs) {
+    List<Widget> children = [];
+    for (int index = 0; index < songs.length; index++) {
+      children.add(SubsonicCard(
+        title: songs[index].title,
+        imageUrl: _musicRepository.getCoverArtUrlFor(
+            songs[index].covertArtId ?? "800000000", null),
+        content: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(songs[index].artist),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(songs[index].formattedDuration),
+            ],
+          ),
+        ],
+        onTap: () {},
+        isThreeLines: true,
+      ));
+    }
 
-  Widget _buildPlaylist(List<Song> songs) {
+    children.add(Container(height: 200));
+
     return RefreshIndicator(
-      onRefresh: _refreshPlaylist,
+      onRefresh: () async {
+        setState(() {
+          _isFetchingData = const fp.Right(true);
+        });
+        await _refreshPlaylist(playlistId);
+      },
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Stack(
           children: [
             ListView(
               shrinkWrap: true,
-              children: [],  // TODO
+              children: children,
             ),
             const MusicPlayer(),
           ],
@@ -51,6 +91,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
+    if (_firstFetch) {
+      _refreshPlaylist(args.playlist.id);
+      _firstFetch = false;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +108,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
             if (state) {
               return const LoadingAnimation(sourceName: "playlist");
             } else {
-              return _buildPlaylist([]);  // TODO
+              return _buildPlaylist(
+                args.playlist.id,
+                _musicRepository.playlist(args.playlist.id),
+              );
             }
           },
         ),

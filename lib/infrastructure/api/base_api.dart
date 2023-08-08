@@ -43,6 +43,16 @@ class BaseAPI {
     return _baseURI(data, getPlaylistsRoute, {});
   }
 
+  Uri getSinglePlaylistUri(ServerData data, String id) {
+    return _baseURI(
+      data,
+      getSinglePlaylistRoute,
+      {
+        "id": id,
+      },
+    );
+  }
+
   Uri getCoverArtUri(ServerData data, String id, String? size) {
     return _baseURI(
       data,

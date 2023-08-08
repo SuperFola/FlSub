@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildPlaylists(List<Playlist> playlists) {
-    var children = List<Widget>.empty(growable: true);
+    List<Widget> children = [];
     for (int index = 0; index < playlists.length; index++) {
       children.add(SubsonicCard(
         title: playlists[index].name,
