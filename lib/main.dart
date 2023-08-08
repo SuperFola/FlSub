@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
+
 import 'domain/model/server.dart';
 import 'properties.dart' as properties;
 
@@ -15,13 +16,16 @@ void main() async {
 
   const storage = FlutterSecureStorage();
 
-  properties.getIt.registerSingleton<ServerData>(ServerData(
-    url: prefs.getString("server.url") ?? "",
-    username: await storage.read(key: "server.username") ?? "",
-    password: await storage.read(key: "server.password") ?? ""
-  ));
+  properties.getIt.registerSingleton<ServerData>(
+    ServerData(
+        url: prefs.getString("server.url") ?? "",
+        username: await storage.read(key: "server.username") ?? "",
+        password: await storage.read(key: "server.password") ?? ""),
+  );
 
-  runApp(MyApp(isLoggedIn: isLoggedIn,));
+  runApp(MyApp(
+    isLoggedIn: isLoggedIn,
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -30,8 +34,7 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.isLoggedIn});
 
   @override
-  State<MyApp> createState() => _MyAppState(isLoggedIn);  // FIXME
-
+  State<MyApp> createState() => _MyAppState(isLoggedIn); // FIXME
 }
 
 class _MyAppState extends State<MyApp> {
@@ -48,10 +51,13 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: isLoggedIn ? MyHomePage(title: properties.getIt<ServerData>().username) : const LoginPage(),
+      home: isLoggedIn
+          ? MyHomePage(title: properties.getIt<ServerData>().username)
+          : const LoginPage(),
       routes: {
         LoginPage.routeName: (BuildContext _) => const LoginPage(),
-        MyHomePage.routeName: (BuildContext _) => MyHomePage(title: properties.getIt<ServerData>().username),
+        MyHomePage.routeName: (BuildContext _) =>
+            MyHomePage(title: properties.getIt<ServerData>().username),
         PlaylistPage.routeName: (BuildContext _) => const PlaylistPage(),
       },
     );

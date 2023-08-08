@@ -8,7 +8,8 @@ import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/api/base_api.dart';
 
 class MusicAPI extends BaseAPI {
-  Future<Either<SubsonicError, List<Playlist>>> getPlaylists(ServerData data) async {
+  Future<Either<SubsonicError, List<Playlist>>> getPlaylists(
+      ServerData data) async {
     try {
       var response = await http.post(super.getPlaylistsUri(data));
       if (response.statusCode == 200) {
@@ -40,5 +41,9 @@ class MusicAPI extends BaseAPI {
     } on http.ClientException catch (e) {
       return Future.value(Left(SubsonicError(-1, e.message)));
     }
+  }
+
+  String getCoverArtUrlFor(ServerData data, String id, String? size) {
+    return super.getCoverArtUri(data, id, size).toString();
   }
 }

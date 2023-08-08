@@ -1,5 +1,7 @@
-class PlaylistArguments {
-  final String title;
+import 'package:subsonic_flutter/domain/model/playlist.dart';
 
-  PlaylistArguments(this.title);
+class PlaylistArguments {
+  final Playlist playlist;
+
+  PlaylistArguments(this.playlist);
 }

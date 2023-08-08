@@ -55,7 +55,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(args.title),
+        title: Text(args.playlist.name),
       ),
       body: Center(
         child: _isFetchingData.match(

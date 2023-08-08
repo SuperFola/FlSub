@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
 import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
@@ -45,9 +46,19 @@ class _MyHomePageState extends State<MyHomePage> {
       children.add(
         Card(
           child: ListTile(
-            leading: const FlutterLogo(size: 72.0),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                imageUrl:
+                    _musicRepository.getCoverArtUrlFor(playlists[index].id, null),
+                height: 72,
+                fit: BoxFit.fill,
+              ),
+            ),
             onTap: () => Navigator.of(context).pushNamed(PlaylistPage.routeName,
-                arguments: PlaylistArguments(playlists[index].name)),
+                arguments: PlaylistArguments(playlists[index])),
             title: Text(playlists[index].name),
             subtitle: Column(
               children: <Widget>[

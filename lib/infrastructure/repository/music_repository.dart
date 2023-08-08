@@ -60,4 +60,9 @@ class MusicRepository {
 
     return _sortedPlaylists;
   }
+
+  String getCoverArtUrlFor(String id, String? size) {
+    final data = getIt<ServerData>();
+    return _musicAPI.getCoverArtUrlFor(data, id, size);
+  }
 }
