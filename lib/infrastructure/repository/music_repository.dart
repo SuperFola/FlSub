@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
@@ -25,6 +26,22 @@ class MusicRepository {
   List<Playlist> _sortedPlaylists = [];
   Map<String, List<Song>> _playlistsSongs = {};
 
+  MusicRepository(SharedPreferences prefs) {
+    String? playlistsData = prefs.getString("playlists");
+
+    if (playlistsData != null) {
+      _playlists = Playlist.decode(playlistsData);
+
+      for (final playlist in _playlists) {
+        String? songsData = prefs.getString("playlists.${playlist.id}");
+
+        if (songsData != null) {
+          _playlistsSongs[playlist.id] = Song.decode(songsData);
+        }
+      }
+    }
+  }
+
   List<Playlist> get playlists => _sortedPlaylists;
 
   PlaylistsSort get playlistSort => _playlistSort;
@@ -46,6 +63,13 @@ class MusicRepository {
       sortPlaylistsBy(_playlistSort);
     });
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("playlists", Playlist.encode(_playlists));
+
+    for (var playlist in _playlists) {
+      await fetchSinglePlaylist(playlist.id);
+    }
+
     return playlists;
   }
 
@@ -57,6 +81,11 @@ class MusicRepository {
     songs.map((data) {
       _playlistsSongs[id] = data;
     });
+
+    if (_playlistsSongs.containsKey(id)) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("playlists.$id", Song.encode(_playlistsSongs[id]!));
+    }
 
     return songs;
   }
@@ -133,7 +162,8 @@ class MusicRepository {
             id: '$index',
             album: song.album,
             title: song.title,
-            artUri: _musicAPI.getCoverArtUri(data, song.covertArtId ?? playlistId, null),
+            artUri: _musicAPI.getCoverArtUri(
+                data, song.coverArtId ?? playlistId, null),
           ),
         ));
       }

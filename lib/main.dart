@@ -41,7 +41,7 @@ void main() async {
         password: await storage.read(key: "server.password") ?? ""),
   );
   properties.getIt.registerSingleton<AudioPlayer>(AudioPlayer());
-  properties.getIt.registerSingleton<MusicRepository>(MusicRepository());
+  properties.getIt.registerSingleton<MusicRepository>(MusicRepository(prefs));
 
   runApp(MyApp(
     isLoggedIn: isLoggedIn,

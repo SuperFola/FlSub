@@ -24,15 +24,15 @@ class MusicAPI extends BaseAPI {
           for (final json in parsed["subsonic-response"]["playlists"]
               ["playlist"]) {
             playlists.add(Playlist(
-              json["id"],
-              json["name"],
-              json["owner"],
-              json["public"],
-              json["created"],
-              json["changed"],
-              json["songCount"],
-              json["duration"],
-              json["covertArt"],
+              id: json["id"],
+              name: json["name"],
+              owner: json["owner"],
+              isPublic: json["public"],
+              createdAt: json["created"],
+              changedAt: json["changed"],
+              songCount: json["songCount"],
+              durationSeconds: json["duration"],
+              coverArtId: json["coverArt"],
             ));
           }
           return Right(playlists);
@@ -59,20 +59,20 @@ class MusicAPI extends BaseAPI {
           List<Song> songs = [];
           for (final json in parsed["subsonic-response"]["playlist"]["entry"]) {
             songs.add(Song(
-              json["id"],
-              json["parent"],
-              json["title"],
-              json["type"],
-              json["albumId"],
-              json["album"],
-              json["artistId"],
-              json["artist"],
-              json["coverArt"],
-              json["duration"],
-              json["bitRate"],
-              json["year"],
-              json["size"],
-              json["contentType"],
+              id: json["id"],
+              parentId: json["parent"],
+              title: json["title"],
+              type: json["type"],
+              albumId: json["albumId"],
+              album: json["album"],
+              artistId: json["artistId"],
+              artist: json["artist"],
+              coverArtId: json["coverArt"],
+              durationSeconds: json["duration"],
+              bitRate: json["bitRate"],
+              year: json["year"],
+              size: json["size"],
+              contentType: json["contentType"],
             ));
           }
           return Right(songs);

@@ -21,10 +21,13 @@ class PlaylistPage extends StatefulWidget {
 
 class _PlaylistPageState extends State<PlaylistPage> {
   final _musicRepository = getIt<MusicRepository>();
-  fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(true);
-  bool _firstFetch = true;
+  fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(false);
 
   Future<void> _refreshPlaylist(String id) async {
+    setState(() {
+      _isFetchingData = const fp.Right(true);
+    });
+
     _musicRepository.fetchSinglePlaylist(id).then((value) {
       value.match((error) {
         _isFetchingData = fp.Left(error);
@@ -96,14 +99,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as PlaylistArguments;
-    if (_firstFetch) {
-      if (!_musicRepository.hasPlaylist(args.playlist.id)) {
-        _refreshPlaylist(args.playlist.id);
-      } else {
-        _isFetchingData = const fp.Right(false);
-      }
-      _firstFetch = false;
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -111,8 +106,14 @@ class _PlaylistPageState extends State<PlaylistPage> {
         title: Text(args.playlist.name),
         actions: [
           IconButton(
-              onPressed: () => _play(args.playlist.id),
-              icon: const Icon(Icons.playlist_play)),
+            onPressed: () =>
+                _musicRepository.fetchSinglePlaylist(args.playlist.id),
+            icon: const Icon(Icons.refresh_rounded),
+          ),
+          IconButton(
+            onPressed: () => _play(args.playlist.id),
+            icon: const Icon(Icons.playlist_play),
+          ),
         ],
       ),
       body: Center(

@@ -101,7 +101,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
         final shuffleModeEnabled = snapshot.data ?? false;
         return IconButton(
           icon: shuffleModeEnabled
-              ? Icon(Icons.shuffle, color: Theme.of(context).colorScheme.primary)
+              ? Icon(Icons.shuffle,
+                  color: Theme.of(context).colorScheme.primary)
               : const Icon(Icons.shuffle, color: Colors.white54),
           onPressed: () async {
             final enable = !shuffleModeEnabled;
