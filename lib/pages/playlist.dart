@@ -87,6 +87,33 @@ class _PlaylistPageState extends State<PlaylistPage> {
     );
   }
 
+  void _showModalPlayOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter myState) {
+            return SizedBox(
+              height: 200,
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: const Text('Random'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _play(String id) {
+    _musicRepository.streamPlaylist(id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final args =
@@ -114,6 +141,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
               );
             }
           },
+        ),
+      ),
+      floatingActionButton: InkWell(
+        onLongPress: () => _showModalPlayOptions(context),
+        child: FloatingActionButton(
+          onPressed: () => _play(args.playlist.id),
+          child: const Icon(Icons.play_arrow),
         ),
       ),
     );

@@ -85,6 +85,26 @@ class MusicAPI extends BaseAPI {
     }
   }
 
+  Future<Either<SubsonicError, Unit>> streamSong(ServerData data, String id) async {
+    try {
+      var response = await http.post(super.getStreamSongUri(data, id));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> parsed = jsonDecode(response.body);
+
+        if (parsed.containsKey("error")) {
+          return Left(SubsonicError(
+              parsed["error"]["code"], parsed["error"]["message"]));
+        } else {
+          return const Right(unit);
+        }
+      }
+
+      return const Left(SubsonicError.unknownError);
+    } on http.ClientException catch (e) {
+      return Future.value(Left(SubsonicError(-1, e.message)));
+    }
+  }
+
   String getCoverArtUrlFor(ServerData data, String id, String? size) {
     return super.getCoverArtUri(data, id, size).toString();
   }
