@@ -5,14 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
-import 'package:subsonic_flutter/properties.dart';
-
-import 'base_api.dart';
+import 'package:subsonic_flutter/infrastructure/api/base_api.dart';
 
 class MusicAPI extends BaseAPI {
-  Future<Either<SubsonicError, List<Playlist>>> getPlaylists() async {
+  Future<Either<SubsonicError, List<Playlist>>> getPlaylists(ServerData data) async {
     try {
-      ServerData data = getIt<ServerData>();
       var response = await http.post(super.getPlaylistsUri(data));
       if (response.statusCode == 200) {
         Map<String, dynamic> parsed = jsonDecode(response.body);

@@ -3,7 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
-
 import 'domain/model/server.dart';
 import 'properties.dart' as properties;
 
@@ -24,10 +23,36 @@ void main() async {
   runApp(MyApp(isLoggedIn: isLoggedIn,));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool isLoggedIn;
 
   const MyApp({super.key, required this.isLoggedIn});
+
+  @override
+  State<MyApp> createState() => _MyAppState(isLoggedIn);  // FIXME
+
+}
+
+class _MyAppState extends State<MyApp> {
+  final bool isLoggedIn;
+
+  _MyAppState(this.isLoggedIn);
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    // FIXME: this doesn't work?
+    //_monet = await MonetProvider.newInstance();
+    // We add a listener to refresh the ui if we get new colors from the wallpaper.
+    //_monet!.addListener(() => setState(() {}));
+
+    //setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

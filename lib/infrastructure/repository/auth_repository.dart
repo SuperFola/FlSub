@@ -1,17 +1,29 @@
-import 'dart:convert';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
+import 'package:subsonic_flutter/infrastructure/api/auth_api.dart';
 import 'package:subsonic_flutter/properties.dart';
 
-import 'base_api.dart';
+class AuthRepository {
+  final _authAPI = AuthAPI();
+  ServerData? _serverData;
+  bool _isLoggedIn = false;
 
-class AuthAPI extends BaseAPI {
-  Future<void> _persistLoginData(String host, String username, String password) async {
+  ServerData? get serverData {
+    if (_isLoggedIn) {
+      return _serverData;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> _persistLoginData(String host, String username,
+      String password) async {
+    _serverData = ServerData(url: host, username: username, password: password);
+    _isLoggedIn = true;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("isLoggedIn", true);
     prefs.setString("server.url", host);
@@ -25,27 +37,17 @@ class AuthAPI extends BaseAPI {
     getIt<ServerData>().url = host;
   }
 
-  Future<Either<SubsonicError, Unit>> login(String host, String username, String password) async {
-    try {
-      var response = await http.post(super.pingUri(host, username, password));
-      if (response.statusCode == 200) {
-        Map<String, dynamic> parsed = jsonDecode(response.body);
+  Future<Either<SubsonicError, Unit>> login(String host, String username,
+      String password) async {
+    var result = await _authAPI.login(host, username, password);
+    result.map((_) => _persistLoginData(host, username, password));
 
-        if (parsed.containsKey("error")) {
-          return Left(SubsonicError(parsed["error"]["code"], parsed["error"]["message"]));
-        } else {
-          await _persistLoginData(host, username, password);
-          return const Right(unit);
-        }
-      }
-
-      return const Left(SubsonicError.unknownError);
-    } on http.ClientException catch (e) {
-      return Future.value(Left(SubsonicError(-1, e.message)));
-    }
+    return result;
   }
 
   Future<void> logout() async {
+    _isLoggedIn = false;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("isLoggedIn", false);
   }

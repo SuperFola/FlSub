@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
-import 'package:subsonic_flutter/infrastructure/auth_api.dart';
+import 'package:subsonic_flutter/infrastructure/repository/auth_repository.dart';
 
 import 'home.dart';
 
@@ -21,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  final AuthAPI _authAPI = AuthAPI();
+  final _authRepository = AuthRepository();
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacementNamed(MyHomePage.routeName);
@@ -49,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
         String username = usernameController.text;
         String password = passwordController.text;
 
-        var pingReq = await _authAPI.login(url, username, password);
+        var pingReq = await _authRepository.login(url, username, password);
         pingReq.match((l) => _showError(context, l),
             (r) => _navigateToHome());
       } on Exception catch (e) {
