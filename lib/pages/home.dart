@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
+import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/pages/playlist.dart';
+import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
+import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -42,6 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
         Card(
           child: ListTile(
             leading: const FlutterLogo(size: 72.0),
+            onTap: () => Navigator.of(context).pushNamed(PlaylistPage.routeName,
+                arguments: PlaylistArguments(playlists[index].name)),
             title: Text(playlists[index].name),
             subtitle: Column(
               children: <Widget>[
@@ -86,49 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildLoadingAnimation() {
-    return const SingleChildScrollView(
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Text('Fetching playlist...'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingDataError(SubsonicError error) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 60,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text(error.message),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _onFilterPlaylistsChanged(PlaylistsSort? value, StateSetter myState) {
     myState(() {
-      _musicRepository.sortBy(value ?? PlaylistsSort.alphabetical);
+      _musicRepository.sortPlaylistsBy(value ?? PlaylistsSort.alphabetical);
     });
     setState(() {});
   }
@@ -148,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Alphabetical'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.alphabetical,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -157,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Reversed alphabetical'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.reverseAlphabetical,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -166,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Ascending duration'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.duration,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -175,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Descending duration'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.descendingDuration,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -184,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Ascending songs count'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.songsCount,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -193,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: const Text('Descending songs count'),
                     leading: Radio<PlaylistsSort>(
                       value: PlaylistsSort.descendingSongsCount,
-                      groupValue: _musicRepository.sort,
+                      groupValue: _musicRepository.playlistSort,
                       onChanged: (PlaylistsSort? value) =>
                           _onFilterPlaylistsChanged(value, myState),
                     ),
@@ -216,10 +182,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: _isFetchingData.match(
-          _buildLoadingDataError,
+          (error) => LoadingDataError(error: error),
           (state) {
             if (state) {
-              return _buildLoadingAnimation();
+              return const LoadingAnimation(sourceName: "playlists");
             } else {
               return _buildPlaylists(_musicRepository.playlists);
             }
@@ -228,8 +194,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showModelFilterPlaylist(context),
-        tooltip: "Filter",
-        child: const Icon(Icons.filter_list),
+        tooltip: "Sort",
+        child: const Icon(Icons.sort),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subsonic_flutter/pages/home.dart';
 import 'package:subsonic_flutter/pages/login.dart';
+import 'package:subsonic_flutter/pages/playlist.dart';
 import 'domain/model/server.dart';
 import 'properties.dart' as properties;
 
@@ -39,22 +40,6 @@ class _MyAppState extends State<MyApp> {
   _MyAppState(this.isLoggedIn);
 
   @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    // FIXME: this doesn't work?
-    //_monet = await MonetProvider.newInstance();
-    // We add a listener to refresh the ui if we get new colors from the wallpaper.
-    //_monet!.addListener(() => setState(() {}));
-
-    //setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -66,7 +51,8 @@ class _MyAppState extends State<MyApp> {
       home: isLoggedIn ? MyHomePage(title: properties.getIt<ServerData>().username) : const LoginPage(),
       routes: {
         LoginPage.routeName: (BuildContext _) => const LoginPage(),
-        MyHomePage.routeName: (BuildContext _) => MyHomePage(title: properties.getIt<ServerData>().username)
+        MyHomePage.routeName: (BuildContext _) => MyHomePage(title: properties.getIt<ServerData>().username),
+        PlaylistPage.routeName: (BuildContext _) => const PlaylistPage(),
       },
     );
   }

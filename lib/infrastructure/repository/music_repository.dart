@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
+import 'package:subsonic_flutter/domain/model/song.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/api/music_api.dart';
 import 'package:subsonic_flutter/properties.dart';
@@ -17,27 +18,27 @@ enum PlaylistsSort {
 class MusicRepository {
   final _musicAPI = MusicAPI();
 
-  PlaylistsSort _sort = PlaylistsSort.alphabetical;
+  PlaylistsSort _playlistSort = PlaylistsSort.alphabetical;
   List<Playlist> _playlists = [];
   List<Playlist> _sortedPlaylists = [];
+  Map<String, List<Song>> _playlistsSongs = {};
 
   List<Playlist> get playlists => _sortedPlaylists;
-
-  PlaylistsSort get sort => _sort;
+  PlaylistsSort get playlistSort => _playlistSort;
 
   Future<Either<SubsonicError, List<Playlist>>> fetchPlaylists() async {
     final data = getIt<ServerData>();
     final playlists = await _musicAPI.getPlaylists(data);
     playlists.map((data) {
       _playlists = data;
-      sortBy(_sort);
+      sortPlaylistsBy(_playlistSort);
     });
 
     return playlists;
   }
 
-  List<Playlist> sortBy(PlaylistsSort sort) {
-    _sort = sort;
+  List<Playlist> sortPlaylistsBy(PlaylistsSort sort) {
+    _playlistSort = sort;
     _sortedPlaylists = _playlists;
 
     switch (sort) {
