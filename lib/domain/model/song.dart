@@ -31,6 +31,8 @@ class Song {
     this.contentType,
   );
 
+  String get safeCoverArtId => covertArtId ?? "800000000";
+
   String get formattedDuration {
     var duration = Duration(seconds: durationSeconds);
     var minutes = (duration.inMinutes % 60).toString().padLeft(2, "0");

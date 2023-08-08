@@ -1,0 +1,43 @@
+name: Android Release
+
+# 1
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: "12.x"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.10.6"
+          channel: 'stable'
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Start release build
+        run: flutter build apk --split-per-abi
+
+      - name: Retrieve Release Version
+        id: versionstep
+        run: |
+          VERSION=$(more pubspec.yaml | grep version: | cut -d ' ' -f2)
+          echo "::set-output name=VERSION::$VERSION"
+      - name: Upload the APK onto Github
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'build/app/outputs/flutter-apk/*.apk'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.versionstep.outputs.VERSION }}

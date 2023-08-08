@@ -1,4 +1,6 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
@@ -82,5 +84,63 @@ class MusicRepository {
   String getCoverArtUrlFor(String id, String? size) {
     final data = getIt<ServerData>();
     return _musicAPI.getCoverArtUrlFor(data, id, size);
+  }
+
+  Future<void> playSong(Song song) async {
+    final data = getIt<ServerData>();
+
+    if (getIt<AudioPlayer>().playing) {
+      getIt<AudioPlayer>().stop();
+    }
+
+    try {
+      await getIt<AudioPlayer>().setAudioSource(AudioSource.uri(
+        _musicAPI.getStreamSongUri(data, song.id),
+        tag: MediaItem(
+          id: '0',
+          album: song.album,
+          title: song.title,
+          artUri: _musicAPI.getCoverArtUri(data, song.safeCoverArtId, null),
+        ),
+      ));
+      getIt<AudioPlayer>().play();
+    } catch (e) {
+      print("Error loading audio source: $e");
+    }
+  }
+
+  Future<void> playPlaylist(String playlistId) async {
+    final data = getIt<ServerData>();
+
+    if (getIt<AudioPlayer>().playing) {
+      getIt<AudioPlayer>().stop();
+    }
+
+    if (_playlistsSongs[playlistId] != null) {
+      List<AudioSource> audiosSources = [];
+
+      for (var index = 0;
+          index < _playlistsSongs[playlistId]!.length;
+          ++index) {
+        final song = _playlistsSongs[playlistId]![index];
+        audiosSources.add(AudioSource.uri(
+          _musicAPI.getStreamSongUri(data, song.id),
+          tag: MediaItem(
+            id: '$index',
+            album: song.album,
+            title: song.title,
+            artUri: _musicAPI.getCoverArtUri(data, song.safeCoverArtId, null),
+          ),
+        ));
+      }
+      var playlist = ConcatenatingAudioSource(children: audiosSources);
+
+      try {
+        await getIt<AudioPlayer>().setAudioSource(playlist);
+        getIt<AudioPlayer>().play();
+      } catch (e) {
+        print("Error loading audio source: $e");
+      }
+    }
   }
 }

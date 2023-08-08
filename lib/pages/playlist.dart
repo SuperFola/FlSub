@@ -41,13 +41,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
       children.add(SubsonicCard(
         title: songs[index].title,
         imageUrl: _musicRepository.getCoverArtUrlFor(
-            songs[index].covertArtId ?? "800000000", null),
+            songs[index].safeCoverArtId, null),
         content: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Flexible(
-                child: Text(songs[index].artist),
+                child: Text(songs[index].album),
               ),
             ],
           ),
@@ -58,7 +58,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
             ],
           ),
         ],
-        onTap: () {},
+        onTap: () => _musicRepository.playSong(songs[index]),
         isThreeLines: true,
       ));
     }
@@ -72,46 +72,23 @@ class _PlaylistPageState extends State<PlaylistPage> {
         });
         await _refreshPlaylist(playlistId);
       },
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Stack(
-          children: [
-            ListView(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
               shrinkWrap: true,
               children: children,
             ),
-            const MusicPlayer(),
-          ],
-        ),
+          ),
+          const MusicPlayer(),
+        ],
       ),
     );
   }
 
-  void _showModalPlayOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter myState) {
-            return SizedBox(
-              height: 200,
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: const Text('Random'),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _play(String id) {
-    _musicRepository.streamPlaylist(id);
+  void _play(String id) async {
+    _musicRepository.playPlaylist(id);
   }
 
   @override
@@ -127,6 +104,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(args.playlist.name),
+        actions: [
+          IconButton(
+              onPressed: () => _play(args.playlist.id),
+              icon: const Icon(Icons.playlist_play)),
+        ],
       ),
       body: Center(
         child: _isFetchingData.match(
@@ -141,13 +123,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
               );
             }
           },
-        ),
-      ),
-      floatingActionButton: InkWell(
-        onLongPress: () => _showModalPlayOptions(context),
-        child: FloatingActionButton(
-          onPressed: () => _play(args.playlist.id),
-          child: const Icon(Icons.play_arrow),
         ),
       ),
     );

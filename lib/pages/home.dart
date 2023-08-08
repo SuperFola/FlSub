@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ));
     }
 
-    children.add(Container(height: 200));
+    children.add(const SizedBox(height: 200));
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -71,18 +71,17 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         await _refreshPlaylists();
       },
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        // FIXME: this adds weird blank spaces at the top and bottom that crops the content
-        child: Stack(
-          children: [
-            ListView(
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
               shrinkWrap: true,
               children: children,
             ),
-            const MusicPlayer(),
-          ],
-        ),
+          ),
+          const MusicPlayer(),
+        ],
       ),
     );
   }
@@ -185,6 +184,12 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () => _showModalFilterPlaylist(context),
+            icon: const Icon(Icons.sort),
+          ),
+        ],
       ),
       body: Center(
         child: _isFetchingData.match(
@@ -197,11 +202,6 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showModalFilterPlaylist(context),
-        tooltip: "Sort",
-        child: const Icon(Icons.sort),
       ),
     );
   }

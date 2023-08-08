@@ -7,7 +7,7 @@ class BaseAPI {
   static const getSinglePlaylistRoute = "$subsonicEndpoint/getPlaylist.view";
   static const getPlaylistsRoute = "$subsonicEndpoint/getPlaylists.view";
   static const getCoverArtRoute = "$subsonicEndpoint/getCoverArt.view";
-  static const streamRoute = "$subsonicEndpoint/hls.m3u8";
+  static const streamRoute = "$subsonicEndpoint/stream.view";
 
   static const defaultParameters = {
     "v": "1.2.0",
@@ -55,7 +55,13 @@ class BaseAPI {
   }
 
   Uri getStreamSongUri(ServerData data, String id) {
-    return _baseURI(data, streamRoute, {"id": id,},);
+    return _baseURI(
+      data,
+      streamRoute,
+      {
+        "id": id,
+      },
+    );
   }
 
   Uri getCoverArtUri(ServerData data, String id, String? size) {
