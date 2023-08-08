@@ -88,34 +88,42 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildLoadingAnimation() {
     return const SingleChildScrollView(
-        child: Center(
-            child: Column(children: <Widget>[
-      SizedBox(
-        width: 60,
-        height: 60,
-        child: CircularProgressIndicator(),
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Fetching playlist...'),
+            ),
+          ],
+        ),
       ),
-      Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: Text('Fetching playlist...'),
-      ),
-    ])));
+    );
   }
 
   Widget _buildLoadingDataError(SubsonicError error) {
     return SingleChildScrollView(
-        child: Center(
-            child: Column(children: <Widget>[
-      const Icon(
-        Icons.error_outline,
-        color: Colors.red,
-        size: 60,
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Text(error.message),
+            ),
+          ],
+        ),
       ),
-      Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: Text(error.message),
-      ),
-    ])));
+    );
   }
 
   void _onFilterPlaylistsChanged(PlaylistsSort? value, StateSetter myState) {
@@ -127,11 +135,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showModelFilterPlaylist(BuildContext context) {
     showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter myState) {
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter myState) {
             return SizedBox(
               height: 200,
               child: ListView(
@@ -193,8 +201,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -205,13 +215,17 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-          child: _isFetchingData.match(_buildLoadingDataError, (state) {
-        if (state) {
-          return _buildLoadingAnimation();
-        } else {
-          return _buildPlaylists(_musicRepository.playlists);
-        }
-      })),
+        child: _isFetchingData.match(
+          _buildLoadingDataError,
+          (state) {
+            if (state) {
+              return _buildLoadingAnimation();
+            } else {
+              return _buildPlaylists(_musicRepository.playlists);
+            }
+          },
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showModelFilterPlaylist(context),
         tooltip: "Filter",
