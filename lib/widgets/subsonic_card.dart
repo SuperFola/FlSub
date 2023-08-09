@@ -27,9 +27,8 @@ class SubsonicCard extends StatelessWidget {
         child: ListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: FractionallySizedBox(
-              widthFactor: 0.17,
-              heightFactor: 1,
+            child: SizedBox.square(
+              dimension: 56,
               child: CachedNetworkImage(
                 fadeInCurve: Curves.fastLinearToSlowEaseIn,
                 cacheKey: cacheKey ?? imageUrl,
