@@ -67,7 +67,7 @@ class MusicRepository {
     prefs.setString("playlists", Playlist.encode(_playlists));
 
     for (var playlist in _playlists) {
-      await fetchSinglePlaylist(playlist.id);
+      fetchSinglePlaylist(playlist.id);
     }
 
     return playlists;
