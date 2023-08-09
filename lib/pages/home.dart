@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
-import 'package:subsonic_flutter/domain/model/playlist_arguments.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
+import 'package:subsonic_flutter/domain/model/playlist_arguments.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/auth_repository.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/infrastructure/time_utils.dart';
 import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
 import 'package:subsonic_flutter/properties.dart';
-import 'package:subsonic_flutter/widgets/loading_data_error.dart';
+import 'package:subsonic_flutter/widgets/bookmark.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
+import 'package:subsonic_flutter/widgets/loading_data_error.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
 import 'package:subsonic_flutter/widgets/subsonic_card.dart';
 
@@ -23,7 +25,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-enum HomePopupMenuSelected { sortPlaylists, reloadPlaylists, logOut }
+enum HomePopupMenuSelected { sortPlaylists, reloadPlaylists, bookmarks, logOut }
 
 class _MyHomePageState extends State<MyHomePage> {
   final _musicRepository = getIt<MusicRepository>();
@@ -71,7 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Text(playlists[index].songCount.toString()),
               const Icon(Icons.my_library_music_outlined),
-              Text(playlists[index].formattedDuration),
+              Text(
+                  formattedDurationWithHours(playlists[index].durationSeconds)),
               const Icon(Icons.timer_outlined),
             ],
           ),
@@ -176,6 +179,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            Text("Filters", style: Theme.of(context).textTheme.titleMedium),
+            const Divider(),
             StatefulBuilder(
               builder: (BuildContext context, StateSetter myState) {
                 return ConstrainedBox(
@@ -194,7 +199,62 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _onPopupMenuSelected(BuildContext context, HomePopupMenuSelected selected) {
+  void _showModalBookmarks(BuildContext context) {
+    children(StateSetter myState) {
+      List<Widget> widgets = [];
+      for (final bookmark in _musicRepository.bookmarks) {
+        widgets.add(Bookmark(
+          bookmark: bookmark,
+          imageUrl:
+              _musicRepository.getCoverArtUrlFor(bookmark.coverArtId, null),
+          cacheKey: bookmark.coverArtId,
+          onRemove: () {
+            myState(() {
+              _musicRepository.deleteBookmark(bookmark.playlistId);
+            });
+          },
+          onPlay: () => _musicRepository.playPlaylistStartingFrom(
+            bookmark.playlistId,
+            bookmark.songId,
+            bookmark.songPositionSeconds,
+          ),
+        ));
+        widgets.add(const Divider());
+      }
+      return widgets;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: true,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text("Bookmarks", style: Theme.of(context).textTheme.titleMedium),
+            const Divider(),
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter myState) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height / 2.0,
+                  ),
+                  child: ListView(
+                    children: children(myState),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _onPopupMenuSelected(
+      BuildContext context, HomePopupMenuSelected selected) {
     switch (selected) {
       case HomePopupMenuSelected.sortPlaylists:
         _showModalFilterPlaylist(context);
@@ -202,6 +262,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
       case HomePopupMenuSelected.reloadPlaylists:
         _refreshPlaylists();
+        break;
+
+      case HomePopupMenuSelected.bookmarks:
+        _showModalBookmarks(context);
         break;
 
       case HomePopupMenuSelected.logOut:
@@ -225,6 +289,10 @@ class _MyHomePageState extends State<MyHomePage> {
               PopupMenuItem(
                 value: HomePopupMenuSelected.sortPlaylists,
                 child: Text("Sort playlists"),
+              ),
+              PopupMenuItem(
+                value: HomePopupMenuSelected.bookmarks,
+                child: Text("Bookmarks"),
               ),
               PopupMenuItem(
                 value: HomePopupMenuSelected.reloadPlaylists,

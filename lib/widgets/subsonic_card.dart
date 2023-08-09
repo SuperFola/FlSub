@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:subsonic_flutter/widgets/cover_art_leading.dart';
 
 class SubsonicCard extends StatelessWidget {
   final String title;
@@ -25,18 +25,9 @@ class SubsonicCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
       child: Card(
         child: ListTile(
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: SizedBox.square(
-              dimension: 56,
-              child: CachedNetworkImage(
-                fadeInCurve: Curves.fastLinearToSlowEaseIn,
-                cacheKey: cacheKey ?? imageUrl,
-                maxHeightDiskCache: 128,
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-              ),
-            ),
+          leading: CoverArtLeading(
+            imageUrl: imageUrl,
+            cacheKey: cacheKey,
           ),
           onTap: onTap,
           title: Text(title, overflow: TextOverflow.ellipsis, maxLines: 1),

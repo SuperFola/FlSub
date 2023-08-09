@@ -4,6 +4,7 @@ import 'package:subsonic_flutter/domain/model/playlist_arguments.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/infrastructure/time_utils.dart';
 import 'package:subsonic_flutter/properties.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/loading_data_error.dart';
@@ -64,7 +65,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(songs[index].formattedDuration),
+              Text(formattedDurationWithHours(songs[index].durationSeconds)),
             ],
           ),
         ],

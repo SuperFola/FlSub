@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:subsonic_flutter/domain/model/bookmark.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
@@ -25,6 +26,7 @@ class MusicRepository {
   List<Playlist> _playlists = [];
   List<Playlist> _sortedPlaylists = [];
   Map<String, List<Song>> _playlistsSongs = {};
+  Map<String, Bookmark> _bookmarks = {};
 
   MusicRepository(SharedPreferences prefs) {
     String? playlistsData = prefs.getString("playlists");
@@ -38,6 +40,13 @@ class MusicRepository {
         if (songsData != null) {
           _playlistsSongs[playlist.id] = Song.decode(songsData);
         }
+
+        String? bookmarkData =
+            prefs.getString("playlists.bookmarks.${playlist.id}");
+
+        if (bookmarkData != null) {
+          _bookmarks[playlist.id] = Bookmark.decode(bookmarkData).first;
+        }
       }
     }
   }
@@ -45,6 +54,8 @@ class MusicRepository {
   List<Playlist> get playlists => _sortedPlaylists;
 
   PlaylistsSort get playlistSort => _playlistSort;
+
+  List<Bookmark> get bookmarks => _bookmarks.values.toList();
 
   List<Song> playlist(String id) {
     return _playlistsSongs[id] ?? [];
@@ -119,32 +130,91 @@ class MusicRepository {
     return _musicAPI.getCoverArtUrlFor(data, id, size);
   }
 
+  Future<void> deleteBookmark(String attachedPlaylistId) async {
+    if (_bookmarks.containsKey(attachedPlaylistId)) {
+      _bookmarks.remove(attachedPlaylistId);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove("playlists.bookmarks.$attachedPlaylistId");
+    }
+  }
+
+  void _saveBookmark(Bookmark bookmark) async {
+    _bookmarks[bookmark.playlistId] = bookmark;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(
+      "playlists.bookmarks.${bookmark.playlistId}",
+      Bookmark.encode([bookmark]),
+    );
+  }
+
+  void _stopAndBookmark(AudioPlayer player) {
+    if (player.playing) {
+      final metadata = player.sequenceState!.currentSource!.tag as MediaItem;
+
+      if (metadata.extras!["canBeBookmarked"]) {
+        final bookmark = Bookmark(
+          songId: metadata.id,
+          playlistId: metadata.extras!["playlistId"],
+          coverArtId: metadata.extras!["coverArtId"],
+          songTitle: metadata.title,
+          playlistName: metadata.extras!["playlistName"],
+          songPositionSeconds: player.position.inSeconds,
+          songDurationSeconds: metadata.extras!["songDuration"],
+        );
+        _saveBookmark(bookmark);
+      }
+
+      player.stop();
+    }
+  }
+
+  AudioSource _makeAudioSource(
+    ServerData data,
+    Song song,
+    String? maybePlaylistId,
+  ) {
+    final playlistId = maybePlaylistId ??
+        _playlistsSongs
+            .filter(
+              (value) => value.filter((t) => t.id == song.id).isNotEmpty,
+            )
+            .keys
+            .first;
+    final coverArtId = song.coverArtId ?? playlistId;
+    final playlistName =
+        _playlists.filter((t) => t.id == playlistId).first.name;
+
+    return AudioSource.uri(
+      _musicAPI.getStreamSongUri(data, song.id),
+      tag: MediaItem(
+        id: song.id,
+        album: song.album,
+        title: song.title,
+        artUri: _musicAPI.getCoverArtUri(data, coverArtId, null),
+        extras: {
+          "playlistId": playlistId,
+          "playlistName": playlistName,
+          "coverArtId": coverArtId,
+          "songDuration": song.durationSeconds,
+          // if we have a playlist given, it can be saved and resumed
+          // otherwise we were given a single song, and if it is interrupted, no need to record that
+          "canBeBookmarked": maybePlaylistId != null,
+        },
+      ),
+    );
+  }
+
   Future<void> playSong(Song song) async {
     final data = getIt<ServerData>();
+    final player = getIt<AudioPlayer>();
 
-    if (getIt<AudioPlayer>().playing) {
-      getIt<AudioPlayer>().stop();
-    }
+    _stopAndBookmark(player);
 
     try {
-      var coverArtId = song.coverArtId;
-      coverArtId ??= _playlistsSongs
-          .filter(
-            (value) => value.filter((t) => t.id == song.id).isNotEmpty,
-          )
-          .keys
-          .first;
-
-      await getIt<AudioPlayer>().setAudioSource(AudioSource.uri(
-        _musicAPI.getStreamSongUri(data, song.id),
-        tag: MediaItem(
-          id: '0',
-          album: song.album,
-          title: song.title,
-          artUri: _musicAPI.getCoverArtUri(data, coverArtId, null),
-        ),
-      ));
-      getIt<AudioPlayer>().play();
+      await player.setAudioSource(_makeAudioSource(data, song, null));
+      player.play();
     } catch (e) {
       print("Error loading audio source: $e");
     }
@@ -152,34 +222,51 @@ class MusicRepository {
 
   Future<void> playPlaylist(String playlistId) async {
     final data = getIt<ServerData>();
+    final player = getIt<AudioPlayer>();
 
-    if (getIt<AudioPlayer>().playing) {
-      getIt<AudioPlayer>().stop();
-    }
+    _stopAndBookmark(player);
 
     if (_playlistsSongs[playlistId] != null) {
       List<AudioSource> audiosSources = [];
 
-      for (var index = 0;
-          index < _playlistsSongs[playlistId]!.length;
-          ++index) {
-        final song = _playlistsSongs[playlistId]![index];
-        audiosSources.add(AudioSource.uri(
-          _musicAPI.getStreamSongUri(data, song.id),
-          tag: MediaItem(
-            id: '$index',
-            album: song.album,
-            title: song.title,
-            artUri: _musicAPI.getCoverArtUri(
-                data, song.coverArtId ?? playlistId, null),
-          ),
-        ));
+      for (final song in _playlistsSongs[playlistId]!) {
+        audiosSources.add(_makeAudioSource(data, song, playlistId));
       }
       var playlist = ConcatenatingAudioSource(children: audiosSources);
 
       try {
-        await getIt<AudioPlayer>().setAudioSource(playlist);
-        getIt<AudioPlayer>().play();
+        await player.setAudioSource(playlist);
+        player.play();
+      } catch (e) {
+        print("Error loading audio source: $e");
+      }
+    }
+  }
+
+  Future<void> playPlaylistStartingFrom(
+      String playlistId, String songId, int atDurationSeconds) async {
+    final data = getIt<ServerData>();
+    final player = getIt<AudioPlayer>();
+
+    _stopAndBookmark(player);
+
+    if (_playlistsSongs[playlistId] != null) {
+      List<AudioSource> audiosSources = [];
+
+      for (final song in _playlistsSongs[playlistId]!) {
+        audiosSources.add(_makeAudioSource(data, song, playlistId));
+      }
+      var playlist = ConcatenatingAudioSource(children: audiosSources);
+      final songIndex = _playlistsSongs[playlistId]!
+          .indexWhere((element) => element.id == songId);
+
+      try {
+        await player.setAudioSource(playlist);
+        player.seek(
+          Duration(seconds: atDurationSeconds),
+          index: songIndex,
+        );
+        player.play();
       } catch (e) {
         print("Error loading audio source: $e");
       }

@@ -35,13 +35,6 @@ class Song {
 
   String get safeCoverArtId => coverArtId ?? "800000000";
 
-  String get formattedDuration {
-    var duration = Duration(seconds: durationSeconds);
-    var minutes = (duration.inMinutes % 60).toString().padLeft(2, "0");
-    var seconds = (duration.inSeconds % 60).toString().padLeft(2, "0");
-    return "$minutes:$seconds";
-  }
-
   factory Song.fromJson(Map<String, dynamic> jsonData) {
     return Song(
       id: jsonData["id"],

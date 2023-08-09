@@ -23,14 +23,6 @@ class Playlist {
     this.coverArtId,
   });
 
-  String get formattedDuration {
-    var duration = Duration(seconds: durationSeconds);
-    var hours = duration.inHours;
-    var minutes = (duration.inMinutes % 60).toString().padLeft(2, "0");
-    var seconds = (duration.inSeconds % 60).toString().padLeft(2, "0");
-    return "$hours:$minutes:$seconds";
-  }
-
   factory Playlist.fromJson(Map<String, dynamic> jsonData) {
     return Playlist(
       id: jsonData["id"],
