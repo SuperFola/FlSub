@@ -4,7 +4,9 @@ import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
+import 'package:subsonic_flutter/infrastructure/repository/auth_repository.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
+import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
 import 'package:subsonic_flutter/properties.dart';
 import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
@@ -21,8 +23,12 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+enum HomePopupMenuSelected { sortPlaylists, reloadPlaylists, logOut }
+
 class _MyHomePageState extends State<MyHomePage> {
   final _musicRepository = getIt<MusicRepository>();
+  final _authRepository = AuthRepository();
+
   fp.Either<SubsonicError, bool> _isFetchingData = const fp.Right(true);
 
   _MyHomePageState() {
@@ -185,6 +191,23 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _onPopupMenuSelected(BuildContext context, HomePopupMenuSelected selected) {
+    switch (selected) {
+      case HomePopupMenuSelected.sortPlaylists:
+        _showModalFilterPlaylist(context);
+        break;
+
+      case HomePopupMenuSelected.reloadPlaylists:
+        _refreshPlaylists();
+        break;
+
+      case HomePopupMenuSelected.logOut:
+        _authRepository.logout();
+        Navigator.of(context).pushReplacementNamed(LoginPage.routeName);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,9 +215,24 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(getIt<ServerData>().username),
         actions: [
-          IconButton(
-            onPressed: () => _showModalFilterPlaylist(context),
-            icon: const Icon(Icons.sort),
+          PopupMenuButton<HomePopupMenuSelected>(
+            onSelected: (value) => _onPopupMenuSelected(context, value),
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (BuildContext context) => const [
+              PopupMenuItem(
+                value: HomePopupMenuSelected.sortPlaylists,
+                child: Text("Sort playlists"),
+              ),
+              PopupMenuItem(
+                value: HomePopupMenuSelected.reloadPlaylists,
+                child: Text("Reload playlists"),
+              ),
+              PopupMenuDivider(),
+              PopupMenuItem(
+                value: HomePopupMenuSelected.logOut,
+                child: Text("Log out"),
+              ),
+            ],
           ),
         ],
       ),
