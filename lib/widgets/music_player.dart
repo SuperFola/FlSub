@@ -137,7 +137,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
           child: Card(
             color: Colors.transparent,
             shadowColor: Colors.grey,
+            elevation: 0.1,
             margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(

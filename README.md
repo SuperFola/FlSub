@@ -1,6 +1,6 @@
 # FlSub
 
-An [Ampache](https://ampache.org/) / [Subsonic](http://www.subsonic.org/pages/index.jsp) client for Android 12 (SDK API >= 31) in Flutter using Material 3.
+An [Ampache](https://ampache.org/) / [Subsonic](http://www.subsonic.org/pages/index.jsp) client for Android 12 (SDK API >= 18) in Flutter using Material 3.
 
 ## Features
 

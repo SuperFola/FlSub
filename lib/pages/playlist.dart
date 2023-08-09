@@ -81,12 +81,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
       },
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              shrinkWrap: true,
-              children: children,
-            ),
+          ListView(
+            shrinkWrap: true,
+            children: children,
           ),
           const MusicPlayer(),
         ],
