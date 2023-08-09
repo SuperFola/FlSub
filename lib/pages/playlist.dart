@@ -41,14 +41,17 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   Widget _buildPlaylist(String playlistId, List<Song> songs) {
     List<Widget> children = [];
+
     for (int index = 0; index < songs.length; index++) {
+      final coverArtIdOrPlaylistId = songs[index].coverArtId ?? playlistId;
+
       children.add(SubsonicCard(
         title: songs[index].title,
         imageUrl: _musicRepository.getCoverArtUrlFor(
-          songs[index].safeCoverArtId,
+          coverArtIdOrPlaylistId,
           null,
         ),
-        cacheKey: songs[index].safeCoverArtId,
+        cacheKey: coverArtIdOrPlaylistId,
         content: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.start,

@@ -32,7 +32,7 @@ class SubsonicCard extends StatelessWidget {
               child: CachedNetworkImage(
                 fadeInCurve: Curves.fastLinearToSlowEaseIn,
                 cacheKey: cacheKey ?? imageUrl,
-                maxHeightDiskCache: 72,
+                maxHeightDiskCache: 128,
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
               ),
