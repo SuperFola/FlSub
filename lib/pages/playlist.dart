@@ -5,8 +5,8 @@ import 'package:subsonic_flutter/domain/model/song.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/properties.dart';
-import 'package:subsonic_flutter/widgets/loading_data_error.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
+import 'package:subsonic_flutter/widgets/loading_data_error.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
 import 'package:subsonic_flutter/widgets/subsonic_card.dart';
 
@@ -45,7 +45,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
       children.add(SubsonicCard(
         title: songs[index].title,
         imageUrl: _musicRepository.getCoverArtUrlFor(
-            songs[index].safeCoverArtId, null),
+          songs[index].safeCoverArtId,
+          null,
+        ),
+        cacheKey: songs[index].safeCoverArtId,
         content: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.start,

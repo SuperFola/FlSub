@@ -64,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
       children.add(SubsonicCard(
         title: playlists[index].name,
         imageUrl: _musicRepository.getCoverArtUrlFor(playlists[index].id, null),
+        cacheKey: playlists[index].id,
         content: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

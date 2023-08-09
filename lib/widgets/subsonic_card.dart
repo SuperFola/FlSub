@@ -5,6 +5,7 @@ class SubsonicCard extends StatelessWidget {
   final String title;
   final String imageUrl;
   final List<Widget> content;
+  final String? cacheKey;
   final bool? isThreeLines;
   final void Function()? onTap;
 
@@ -13,6 +14,7 @@ class SubsonicCard extends StatelessWidget {
     required this.title,
     required this.imageUrl,
     required this.content,
+    this.cacheKey,
     this.isThreeLines,
     this.onTap,
   });
@@ -26,7 +28,7 @@ class SubsonicCard extends StatelessWidget {
           child: CachedNetworkImage(
             fadeInCurve: Curves.fastLinearToSlowEaseIn,
             placeholder: (context, url) => const SizedBox(height: 72),
-            cacheKey: imageUrl,
+            cacheKey: cacheKey ?? imageUrl,
             maxHeightDiskCache: 72,
             imageUrl: imageUrl,
             height: 72,
