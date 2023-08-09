@@ -65,6 +65,14 @@ class MusicRepository {
     return _playlistsSongs.containsKey(id);
   }
 
+  bool hasBookmark(String playlistId) {
+    return _bookmarks.containsKey(playlistId);
+  }
+
+  Bookmark? getBookmark(String playlistId) {
+    return _bookmarks[playlistId];
+  }
+
   Future<Either<SubsonicError, List<Playlist>>> fetchPlaylists() async {
     final data = getIt<ServerData>();
     final playlists = await _musicAPI.getPlaylists(data);
@@ -149,24 +157,21 @@ class MusicRepository {
     );
   }
 
-  void _stopAndBookmark(AudioPlayer player) {
-    if (player.playing) {
-      final metadata = player.sequenceState!.currentSource!.tag as MediaItem;
+  void makeBookmarkForCurrentAudioSource() {
+    final player = getIt<AudioPlayer>();
+    final metadata = player.sequenceState!.currentSource!.tag as MediaItem;
 
-      if (metadata.extras!["canBeBookmarked"]) {
-        final bookmark = Bookmark(
-          songId: metadata.id,
-          playlistId: metadata.extras!["playlistId"],
-          coverArtId: metadata.extras!["coverArtId"],
-          songTitle: metadata.title,
-          playlistName: metadata.extras!["playlistName"],
-          songPositionSeconds: player.position.inSeconds,
-          songDurationSeconds: metadata.extras!["songDuration"],
-        );
-        _saveBookmark(bookmark);
-      }
-
-      player.stop();
+    if (metadata.extras!["canBeBookmarked"]) {
+      final bookmark = Bookmark(
+        songId: metadata.id,
+        playlistId: metadata.extras!["playlistId"],
+        coverArtId: metadata.extras!["coverArtId"],
+        songTitle: metadata.title,
+        playlistName: metadata.extras!["playlistName"],
+        songPositionSeconds: player.position.inSeconds,
+        songDurationSeconds: metadata.extras!["songDuration"],
+      );
+      _saveBookmark(bookmark);
     }
   }
 
@@ -210,7 +215,10 @@ class MusicRepository {
     final data = getIt<ServerData>();
     final player = getIt<AudioPlayer>();
 
-    _stopAndBookmark(player);
+    if (player.playing) {
+      makeBookmarkForCurrentAudioSource();
+      player.stop();
+    }
 
     try {
       await player.setAudioSource(_makeAudioSource(data, song, null));
@@ -224,7 +232,10 @@ class MusicRepository {
     final data = getIt<ServerData>();
     final player = getIt<AudioPlayer>();
 
-    _stopAndBookmark(player);
+    if (player.playing) {
+      makeBookmarkForCurrentAudioSource();
+      player.stop();
+    }
 
     if (_playlistsSongs[playlistId] != null) {
       List<AudioSource> audiosSources = [];
@@ -248,7 +259,10 @@ class MusicRepository {
     final data = getIt<ServerData>();
     final player = getIt<AudioPlayer>();
 
-    _stopAndBookmark(player);
+    if (player.playing) {
+      makeBookmarkForCurrentAudioSource();
+      player.stop();
+    }
 
     if (_playlistsSongs[playlistId] != null) {
       List<AudioSource> audiosSources = [];

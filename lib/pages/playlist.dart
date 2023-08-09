@@ -95,8 +95,30 @@ class _PlaylistPageState extends State<PlaylistPage> {
     );
   }
 
-  void _play(String id) async {
-    _musicRepository.playPlaylist(id);
+  List<Widget> _buildActionButtons(String playlistId) {
+    List<Widget> actions = [];
+
+    if (_musicRepository.hasBookmark(playlistId)) {
+      final bookmark = _musicRepository.getBookmark(playlistId);
+
+      actions.add(
+        IconButton(
+          onPressed: () => _musicRepository.playPlaylistStartingFrom(playlistId, bookmark!.songId, bookmark.songPositionSeconds),
+          tooltip: "Resume listening to bookmark",
+          icon: const Icon(Icons.play_lesson_outlined),
+        ),
+      );
+    }
+
+    actions.add(
+      IconButton(
+        onPressed: () => _musicRepository.playPlaylist(playlistId),
+        tooltip: "Start listening",
+        icon: const Icon(Icons.playlist_play),
+      ),
+    );
+
+    return actions;
   }
 
   @override
@@ -108,12 +130,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(args.playlist.name),
-        actions: [
-          IconButton(
-            onPressed: () => _play(args.playlist.id),
-            icon: const Icon(Icons.playlist_play),
-          ),
-        ],
+        actions: _buildActionButtons(args.playlist.id),
       ),
       body: Center(
         child: _isFetchingData.match(

@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:subsonic_flutter/domain/model/position_data.dart';
+import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/properties.dart';
 import 'package:subsonic_flutter/widgets/music_player/seek_bar.dart';
 
@@ -24,6 +25,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
               position, bufferedPosition, duration ?? Duration.zero));
 
   AudioPlayer get _player => getIt<AudioPlayer>();
+
+  MusicRepository get _musicRepository => getIt<MusicRepository>();
 
   Widget _buildPlayButton() {
     return StreamBuilder<PlayerState>(
@@ -49,7 +52,11 @@ class _MusicPlayerState extends State<MusicPlayer> {
           );
         } else if (processingState != ProcessingState.completed) {
           return FloatingActionButton(
-            onPressed: _player.pause,
+            onPressed: () {
+              // try and make a bookmark before stopping
+              _musicRepository.makeBookmarkForCurrentAudioSource();
+              _player.pause();
+            },
             elevation: 0,
             child: const Icon(Icons.pause, size: iconSize),
           );
