@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
-import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
+import 'package:subsonic_flutter/domain/model/playlist_arguments.dart';
 import 'package:subsonic_flutter/domain/model/playlist.dart';
 import 'package:subsonic_flutter/domain/model/server.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
@@ -9,7 +9,7 @@ import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart
 import 'package:subsonic_flutter/pages/login.dart';
 import 'package:subsonic_flutter/pages/playlist.dart';
 import 'package:subsonic_flutter/properties.dart';
-import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
+import 'package:subsonic_flutter/widgets/loading_data_error.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
 import 'package:subsonic_flutter/widgets/subsonic_card.dart';

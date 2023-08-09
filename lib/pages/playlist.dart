@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart' as fp;
-import 'package:subsonic_flutter/domain/model/PlaylistArguments.dart';
+import 'package:subsonic_flutter/domain/model/playlist_arguments.dart';
 import 'package:subsonic_flutter/domain/model/song.dart';
 import 'package:subsonic_flutter/domain/model/subsonic_error.dart';
 import 'package:subsonic_flutter/infrastructure/repository/music_repository.dart';
 import 'package:subsonic_flutter/properties.dart';
-import 'package:subsonic_flutter/widgets/LoadingDataError.dart';
+import 'package:subsonic_flutter/widgets/loading_data_error.dart';
 import 'package:subsonic_flutter/widgets/loading_animation.dart';
 import 'package:subsonic_flutter/widgets/music_player.dart';
 import 'package:subsonic_flutter/widgets/subsonic_card.dart';
@@ -105,11 +105,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(args.playlist.name),
         actions: [
-          IconButton(
-            onPressed: () =>
-                _musicRepository.fetchSinglePlaylist(args.playlist.id),
-            icon: const Icon(Icons.refresh_rounded),
-          ),
           IconButton(
             onPressed: () => _play(args.playlist.id),
             icon: const Icon(Icons.playlist_play),

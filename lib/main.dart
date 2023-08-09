@@ -54,14 +54,10 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.isLoggedIn});
 
   @override
-  State<MyApp> createState() => _MyAppState(isLoggedIn); // FIXME
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  final bool isLoggedIn;
-
-  _MyAppState(this.isLoggedIn);
-
   @override
   void initState() {
     super.initState();
@@ -129,7 +125,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             useMaterial3: true,
           ),
           themeMode: ThemeMode.system,
-          home: isLoggedIn ? const MyHomePage() : const LoginPage(),
+          home: widget.isLoggedIn ? const MyHomePage() : const LoginPage(),
           onGenerateRoute: (settings) {
             switch (settings.name) {
               case LoginPage.routeName:
