@@ -127,13 +127,21 @@ class MusicRepository {
     }
 
     try {
+      var coverArtId = song.coverArtId;
+      coverArtId ??= _playlistsSongs
+          .filter(
+            (value) => value.filter((t) => t.id == song.id).isNotEmpty,
+          )
+          .keys
+          .first;
+
       await getIt<AudioPlayer>().setAudioSource(AudioSource.uri(
         _musicAPI.getStreamSongUri(data, song.id),
         tag: MediaItem(
           id: '0',
           album: song.album,
           title: song.title,
-          artUri: _musicAPI.getCoverArtUri(data, song.safeCoverArtId, null),
+          artUri: _musicAPI.getCoverArtUri(data, coverArtId, null),
         ),
       ));
       getIt<AudioPlayer>().play();
