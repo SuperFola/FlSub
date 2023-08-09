@@ -11,6 +11,7 @@ FlSub is an app first made for my own needs: listening to playlists and smart pl
 Bunch of cool (and technical) things:
 - Material 3 support
 - Dynamic color support (fallback to system theme if not available)
+- Bookmarks generated when a playlist listening session is interrupted by a song or another playlist
 - Caching playlists to disk to avoid useless API calls (songs are not cached though, only metadata)
 - Subsonic authentication with salt+password for more security (salt changed for each request)
 
@@ -39,6 +40,7 @@ Tested with Ampache 5.6.2.
 |:---------------------------------------------------------------------:|:-------------------------------------------------------------------:|
 |  ![playlists screen light mode](.github/images/playlists_light.png)   |  ![playlists screen dark mode](.github/images/playlists_dark.png)   |
 | ![playlists sort light mode](.github/images/playlists_sort_light.png) | ![playlists sort dark mode](.github/images/playlists_sort_dark.png) |
+|   ![playlists sort light mode](.github/images/bookmarks_light.png)    |   ![playlists sort dark mode](.github/images/bookmarks_dark.png)    |
 
 ### Viewing a single playlist
 
