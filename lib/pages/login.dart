@@ -21,8 +21,9 @@ class _LoginPageState extends State<LoginPage> {
 
   final _authRepository = AuthRepository();
 
-  void _navigateToHome() {
-    Navigator.of(context).pushReplacementNamed(MyHomePage.routeName);
+  _LoginPageState() {
+    serverUrlController.text = _authRepository.serverData?.url ?? "";
+    usernameController.text = _authRepository.serverData?.username ?? "";
   }
 
   void _showError(BuildContext context, SubsonicError error) {
@@ -48,7 +49,10 @@ class _LoginPageState extends State<LoginPage> {
         String password = passwordController.text;
 
         var pingReq = await _authRepository.login(url, username, password);
-        pingReq.match((l) => _showError(context, l), (r) => _navigateToHome());
+        pingReq.match(
+            (l) => _showError(context, l),
+            (r) => Navigator.of(context)
+                .pushReplacementNamed(MyHomePage.routeName));
       } on Exception catch (e) {
         // FIXME maybe do not show the whole error message here
         _showError(context, SubsonicError(-1, e.toString()));
@@ -110,8 +114,9 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFormField(
                       controller: serverUrlController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Server URL"),
+                        border: OutlineInputBorder(),
+                        labelText: "Server URL",
+                      ),
                       validator: _validateServerURL,
                     )),
                 Padding(
@@ -120,7 +125,9 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFormField(
                       controller: usernameController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(), labelText: "Username"),
+                        border: OutlineInputBorder(),
+                        labelText: "Username",
+                      ),
                       validator: _validateUsername,
                     )),
                 Padding(
@@ -130,7 +137,9 @@ class _LoginPageState extends State<LoginPage> {
                       controller: passwordController,
                       obscureText: true,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(), labelText: "Password"),
+                        border: OutlineInputBorder(),
+                        labelText: "Password",
+                      ),
                       validator: _validatePassword,
                     )),
                 Padding(

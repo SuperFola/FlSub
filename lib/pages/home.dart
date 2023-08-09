@@ -36,8 +36,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _refreshPlaylists() async {
-    setState(() {
-      _isFetchingData = const fp.Right(true);
+    // set state only if it is needed
+    _isFetchingData.map((state) {
+      if (!state) {
+        setState(() {
+          _isFetchingData = const fp.Right(true);
+        });
+      }
     });
 
     _musicRepository.fetchPlaylists().then((value) {
