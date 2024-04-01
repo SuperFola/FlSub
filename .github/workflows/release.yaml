@@ -20,12 +20,21 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: "12.x"
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.10.6"
           channel: 'stable'
+
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Decode keystore
+        run: |
+          TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
+          mkdir "${TMP_KEYSTORE_FILE_PATH}"
+          echo "${{ secrets.ENCODED_KEYSTORE_JKS }}" | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/upload-keystore.jks
+          echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | sed "s|//|${TMP_KEYSTORE_FILE_PATH}|g" > android/key.properties
 
       - name: Start release build
         run: flutter build apk --split-per-abi
@@ -34,7 +43,8 @@ jobs:
         id: versionstep
         run: |
           VERSION=$(more pubspec.yaml | grep version: | cut -d ' ' -f2)
-          echo "::set-output name=VERSION::$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Upload the APK onto Github
         uses: ncipollo/release-action@v1
         with:

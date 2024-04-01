@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Secrets and config that shouldn't be commited
+android/key.properties
+
 # Symbolication related
 app.*.symbols
 
